@@ -1,0 +1,12 @@
+EE810 – JAVA Final Project Proposal
+Team Members: Yiran Li, Haoyang Li, Haoyu Zhang
+Subject: Calendar Application
+Project Description: We would like to develop a Calendar application based on C/S model using GUI programming.
+Functional implements:
+(1)	Changing the Year, Month to view the exact day;
+(2)	Defining weekend days as holidays;
+(3)	Loading the existing general vacation days and allowing users to set the individual important days;
+(4)	Setting individual events on the calendar;
+(5)	Reminding the approaching holidays or events both ahead of days that can be determined by users and on those days year by year;
+(6)	Creating a reservation system with which we can avoid the time conflict. If we are going to set an event in a certain period and unfortunately there has been an important event lying there in that time, the reservation system can remind us the time conflict;
+(7)	Saving out the state of the system to a file as JSON in such a way that you can load it back.
