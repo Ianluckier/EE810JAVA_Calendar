@@ -1,0 +1,321 @@
+import java.awt.*;
+import java.awt.event.*;
+import java.text.*;
+import javax.swing.*;
+import java.util.Calendar;
+import java.util.Date;
+/* 
+ * Calendar JFrame Interface
+ */
+
+public class MyCalendarWindow extends JFrame {
+	private Calendar cal;
+	private String[] headers = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
+	private DateFormat df = new SimpleDateFormat("yy/MM/dd HH:mm");
+	private Container c = getContentPane();
+	private JPanel p_control, p_display, p_footer;
+	private JLabel lb_DayOfWeek, lb_yr, lb_mon, lb_messege;
+	private JLabel[] display;
+	private JComboBox combo_yr, combo_mon;
+	private JButton btn_before, btn_current, btn_after, btn_export, btn_import;
+	private int currentYear, currentMonth, maxDayOfMonth, firstDayIndex;
+	private int flag; 
+	private int temp = 2;
+
+	public MyCalendarWindow() {
+		super("EE810 JAVA Project: Calendar");
+	    p_control = new JPanel();
+	    p_control.setBackground(Color.orange);
+	    p_display = new JPanel();
+	    p_display.setLayout(new GridLayout(7,7));
+	    p_display.setBackground(new Color(0, 191, 255));
+	    p_footer = new JPanel();
+	    p_footer.setBackground(Color.orange);
+	    
+	    c.add(p_control, BorderLayout.NORTH);
+	    c.add(p_display, BorderLayout.CENTER);
+	    c.add(p_footer, BorderLayout.SOUTH);
+	    
+	    lb_yr = new JLabel("Year:");
+	    combo_yr = new JComboBox();
+	    for (int i=1980; i<=2030; i++) {
+	    	combo_yr.addItem(new Integer(i));
+	    }
+	    combo_yr.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		currentYear = Integer.parseInt(((JComboBox)e.getSource()).getSelectedItem().toString());
+	    		clear();
+	    		init();
+	    	}
+	    });
+	    
+	    lb_mon = new JLabel("Month:");
+	    combo_mon = new JComboBox();
+	    for (int i=1; i<=12; i++) {
+	    	combo_mon.addItem(new Integer(i));
+	    }
+	    combo_mon.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		currentMonth = Integer.parseInt(((JComboBox)e.getSource()).getSelectedItem().toString());
+	    		clear();
+	    		init();
+	    	}
+	    });
+	    
+	    btn_before = new JButton("<");
+	    btn_before.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		if (currentMonth == 1) {
+	    			currentMonth = 12;
+	    			currentYear -= 1;
+	    		}
+	    		else {
+	    			currentMonth -= 1;
+	    		}	    		
+	    		clear();
+	    		init();
+	    	}
+	    });
+	    btn_current = new JButton("Now");
+	    btn_current.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		currentYear = cal.get(Calendar.YEAR);
+	    		currentMonth = cal.get(Calendar.MONTH) + 1;
+	    		clear();
+	    		init();
+	    	}
+	    });
+	    btn_after = new JButton(">");
+	    btn_after.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		if (currentMonth == 12) {
+	    			currentMonth = 1;
+	    			currentYear += 1;
+	    		}
+	    		else {
+	    			currentMonth += 1;
+	    		}	    		
+	    		clear();
+	    		init();
+	    	}
+	    });
+	    btn_import = new JButton("import");
+	    btn_import.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		System.out.println("Please import the calendar file!");
+	    	}
+	    });
+	    btn_export = new JButton("export");
+	    btn_export.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		lb_messege.setVisible(true);
+	    	}
+	    });
+	    lb_messege = new JLabel("Successfully saved!");
+	    lb_messege.setVisible(false);
+	    
+	    p_control.add(lb_yr);
+	    p_control.add(combo_yr);
+	    p_control.add(lb_mon);
+	    p_control.add(combo_mon);
+	    p_control.add(btn_before);
+	    p_control.add(btn_current);
+	    p_control.add(btn_after);
+	    p_footer.add(btn_import);
+	    p_footer.add(btn_export);
+	    p_footer.add(lb_messege);
+	    
+	    display = new JLabel[42];
+	    for (int i=0; i<7; i++) {
+	    	if(i == 0 || i == 6) {
+	    		lb_DayOfWeek = new JLabel(headers[i], JLabel.CENTER);
+		    	lb_DayOfWeek.setOpaque(true);
+		    	lb_DayOfWeek.setBackground(Color.pink);
+	    	}
+	    	else {
+	    		lb_DayOfWeek = new JLabel(headers[i], JLabel.CENTER);
+		    	lb_DayOfWeek.setOpaque(true);
+		    	lb_DayOfWeek.setBackground(new Color(0, 191, 255));
+	    	}
+	    	p_display.add(lb_DayOfWeek);
+	    }
+	    for (int i=0; i<display.length; i++) {
+	    	display[i] = new JLabel("", JLabel.CENTER);
+	    	if(i%7 == 0 || i%7 == 6) {
+	    		display[i].setOpaque(true);
+	    		display[i].setBackground(Color.pink);
+	    	}
+	    	p_display.add(display[i]);
+	    }
+
+	    cal = Calendar.getInstance();
+		cal.setFirstDayOfWeek(Calendar.SUNDAY);
+		currentYear = cal.get(Calendar.YEAR);
+		currentMonth = cal.get(Calendar.MONTH) + 1;	
+		
+		setSize(520, 400);
+		setLocation(300, 300);
+		setVisible(true);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  
+	    setResizable(false); 
+	}
+	
+	public void init() {
+		maxDayOfMonth = getDays(currentYear, currentMonth);
+		firstDayIndex = getFirstDayOfWeek(currentYear, currentMonth);
+		combo_yr.setSelectedItem(new Integer(currentYear));
+		combo_mon.setSelectedItem(new Integer(currentMonth));
+		
+        switch (firstDayIndex) {
+        	case 7:
+        		display[0].setText("1");
+        		flag = 0;
+        		break;
+        	case 1:
+        		display[1].setText("1");
+        		flag = 1;
+        		break;
+        	case 2:
+        		display[2].setText("1");
+        		flag = 2;
+        		break;
+        	case 3:
+        		display[3].setText("1");
+        		flag = 3;
+        		break;
+        	case 4:
+        		display[4].setText("1");
+        		flag = 4;
+        		break;
+        	case 5:
+        		display[5].setText("1");
+        		flag = 5;
+        		break;
+        	case 6:
+        		display[6].setText("1");
+        		flag = 6;
+        		break;
+        }
+        
+        for (int i=flag+1; i<flag+1+maxDayOfMonth-1; i++) {
+        	display[i].setText(temp + "");
+        	temp++;
+        }
+        temp = 2;
+	}
+	
+	public boolean isLeap(int year)  
+	{  
+		if (((year % 100 == 0) && year % 400 == 0) || ((year % 100 != 0) && year % 4 == 0))  
+			return true;  
+	    else  
+	    	return false;  
+	} 
+	 
+	public int getDays(int year, int month)  
+    {  
+        int days = 0;  
+        int FebDay = 28;  
+        if (isLeap(year))  
+            FebDay = 29;  
+        switch (month)  
+        {  
+            case 1:  
+            case 3:  
+            case 5:  
+            case 7:  
+            case 8:  
+            case 10:  
+            case 12:  
+                days = 31;  
+                break;  
+            case 4:  
+            case 6:  
+            case 9:  
+            case 11:  
+                days = 30;  
+                break;  
+            case 2:  
+                days = FebDay;  
+                break;  
+        }  
+        return days;  
+    }  
+	
+	public int getFirstDayOfWeek(int year, int month) {
+		int cen = 0;
+		int mon = 0;
+		if (year < 2000)
+			cen = 0;
+		if (year >= 2000)
+			cen = 6;
+		switch (month) {
+		case 1:
+			if(isLeap(year)) {
+				mon = 0;
+			}
+			else {
+				mon = 1;
+			}			
+			break;
+		case 2:
+			if(isLeap(year)) {
+				mon = 3;
+			}
+			else {
+				mon = 4;
+			}	
+			break;
+		case 3:
+			mon = 4;
+			break;
+		case 4:
+			mon = 0;
+			break;
+		case 5:
+			mon = 2;
+			break;
+		case 6:
+			mon = 5;
+			break;
+		case 7:
+			mon = 0;
+			break;
+		case 8:
+			mon = 3;
+			break;
+		case 9:
+			mon = 6;
+			break;
+		case 10:
+			mon = 1;
+			break;
+		case 11:
+			mon = 4;
+			break;
+		case 12:
+			mon = 6;
+			break;
+		}
+		
+		String str_year = String.valueOf(year);
+		String str_last2 = str_year.charAt(2) + "" + str_year.charAt(3);
+		int twoDigit = Integer.parseInt(str_last2);
+		int dayIndexResult = (((((twoDigit % 7) + (twoDigit / 4) + cen) % 7) - 1) + mon) + 1; 
+        if (dayIndexResult > 7)
+        	dayIndexResult %= 7;
+		return dayIndexResult;
+	}
+	
+	public void clear() {
+		for (int i=0; i<display.length; i++) {
+			display[i].setText("");
+		}
+	}
+	
+	public static void main(String[] args) {
+		MyCalendarWindow myCalendar = new MyCalendarWindow();
+		myCalendar.clear();
+		myCalendar.init();
+	}
+}
