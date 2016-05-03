@@ -1,0 +1,10 @@
+display[i].addMouseListener(new MouseAdapter() {
+	    		public void mouseClicked(MouseEvent e) {
+	    			if (e.getClickCount() == 2) {	    		
+	    				if (((JLabel)e.getSource()).getText().length() > 2) {
+	    					messege = "Today is : " + currentYear + " / " + currentMonth + " / " + ((JLabel)e.getSource()).getText();
+	    					JOptionPane.showMessageDialog(p_footer, messege);
+	    				}
+	    			}
+	    		}
+	    	});
