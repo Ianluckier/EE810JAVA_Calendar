@@ -1,0 +1,23 @@
+public void setEventContent(int currentYear, int currentMonth, int currentDay, Map<String, String> eventmap) throws ParseException {
+		this.currentYear = currentYear;
+		this.currentMonth = currentMonth;
+		this.currentDay = currentDay;
+		this.eventmap = eventmap;
+		sdf = new SimpleDateFormat("yyyy/MM/dd"); 
+		currentDate = sdf.parse(currentYear + "/" + currentMonth + "/" + currentDay);
+		setEvent = eventmap.keySet();
+		allEvents = setEvent.toArray(new String[setEvent.size()]);
+		for (int i=0; i<allEvents.length; i++) {
+			String[] splitEventDate = allEvents[i].split("/");
+			eventDate = sdf.parse(splitEventDate[0] + "/" + splitEventDate[1] + "/" + splitEventDate[2]);
+			cal.setTime(currentDate);
+			long time1 = cal.getTimeInMillis();
+			cal.setTime(eventDate);
+			long time2 = cal.getTimeInMillis();
+			long between_days = (time2 - time1) / (1000*3600*24);
+			if (between_days > 0) {
+				eventContent += eventmap.get(allEvents[i]) + "still" + between_days + "Days" + "\n";
+			}
+		}
+		ta_event.setText(eventContent);
+	}
